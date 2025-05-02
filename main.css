@@ -1,0 +1,19 @@
+body {
+    background-color: powderblue;
+    text-align: center;
+}
+h2 {
+    color: black;
+}
+
+p {
+    color:black;
+}
+
+a:hover {
+    color:blue
+}
+
+li {
+    font-size:18px;
+}
