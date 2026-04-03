@@ -1,25 +1,799 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="main.css">
-<title>jordanpalumbo.com/main</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jordan Palumbo — Cybersecurity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #090c10;
+      --surface: #0d1117;
+      --border: #1e2d3d;
+      --accent: #00e5ff;
+      --accent2: #7fff00;
+      --muted: #4a5568;
+      --text: #cdd9e5;
+      --text-dim: #6e7f8d;
+      --heading: #e6edf3;
+      --tag-bg: #112030;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,229,255,0.013) 2px,
+        rgba(0,229,255,0.013) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Grid background */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(9,12,16,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+    }
+
+    section + section {
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 80px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      line-height: 1;
+      color: var(--heading);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: var(--text-dim);
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    .hero-bio {
+      max-width: 560px;
+      color: var(--text);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.4rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn:hover { background: var(--accent); color: var(--bg); }
+
+    .btn-ghost {
+      border-color: var(--border);
+      color: var(--text-dim);
+    }
+
+    .btn-ghost:hover { border-color: var(--text-dim); background: transparent; color: var(--text); }
+
+    /* Blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SECTION HEADINGS ── */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 3rem;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--heading);
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-date {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .card ul {
+      list-style: none;
+      margin-top: 0.75rem;
+    }
+
+    .card ul li {
+      font-size: 0.82rem;
+      color: var(--text);
+      padding: 0.2rem 0;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .card ul li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .card-coursework {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .card-coursework span { color: var(--accent2); }
+
+    /* ── SKILLS GRID ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .skill-group:hover { border-color: var(--accent); }
+
+    .skill-group-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-list {
+      list-style: none;
+    }
+
+    .skill-list li {
+      font-size: 0.8rem;
+      color: var(--text);
+      padding: 0.2rem 0;
+    }
+
+    .skill-list li::before {
+      content: '# ';
+      color: var(--text-dim);
+    }
+
+    /* ── PROJECTS ── */
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.25rem;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .project-card:hover { border-color: var(--accent2); }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent2);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .project-card:hover::before { opacity: 1; }
+
+    .project-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .project-title a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .project-title a:hover { color: var(--accent2); }
+
+    .project-desc {
+      font-size: 0.82rem;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      margin: 0.2rem 0.2rem 0 0;
+    }
+
+    .tag-accent { border-color: rgba(0,229,255,0.3); color: var(--accent); }
+    .tag-green { border-color: rgba(127,255,0,0.3); color: var(--accent2); }
+
+    /* ── CERT BADGE ── */
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .cert-card:hover { border-color: var(--accent); }
+
+    .cert-icon {
+      width: 48px;
+      height: 48px;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
+    .cert-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--heading);
+    }
+
+    .cert-id {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      text-align: center;
+    }
+
+    #contact h2 { margin-bottom: 1rem; }
+
+    .contact-line {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+    }
+
+    .contact-email {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .contact-email:hover { border-color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── FADE-IN ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { gap: 1.2rem; }
+      section { padding: 5rem 1.25rem; }
+      .cert-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+  </style>
 </head>
 <body>
-<h2>Jordan Palumbo</h2>
-<br></br>
-<p>Welcome to jordanpalumbo.com! This website is a résumé displaying my skills!</p>
 
-<br></br>
-<a href="education.html"><p>Education</p></a>
-<a href="experience.html"><p>Experience</p></a>
-<a href="skills.html"><p>Skills</p></a>
-<a href="involvement.html"><p>Community Involvement</p></a>
-<a href="projects.html"><p>Projects</p></a>
-<a href="certifications.html"><p>Certifications</p></a>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#hero">JP</a>
+    <ul class="nav-links">
+      <li><a href="#experience">Exp</a></li>
+      <li><a href="#education">Edu</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#certifications">Certs</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-<br></br>
-<h5 style="font-size:19px">To reach out for any questions, contact me here:</h5><a href="mailto:palumbojordan9@gmail.com"><h5 style="font-size:19px;">palumbojordan9@gmail.com</h5></a> 
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow">Available for opportunities</div>
+    <h1>Jordan<br><span class="accent">Palumbo</span><span class="cursor"></span></h1>
+    <p class="hero-sub">Cybersecurity Student &amp; Researcher</p>
+    <p class="hero-bio">
+      B.S. Cybersecurity candidate at the University at Albany, focused on network security, digital forensics, and penetration testing. I build security tools, probe systems for vulnerabilities, and hold a CompTIA Security+ certification.
+    </p>
+    <div class="hero-links">
+      <a class="btn" href="mailto:palumbojordan9@gmail.com">✉ Get in touch</a>
+      <a class="btn btn-ghost" href="https://github.com/jordanpalumbo" target="_blank" rel="noopener">⌥ GitHub</a>
+      <a class="btn btn-ghost" href="#projects">↓ My work</a>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <p class="section-label">Work &amp; Research</p>
+    <h2>Experience</h2>
+
+    <div class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Mobile Sensor Lab</div>
+          <div class="card-subtitle">University at Albany</div>
+        </div>
+        <div class="card-date">Jan 2025 – May 2025</div>
+      </div>
+      <ul>
+        <li>Programmed a driving simulator for the New York State Police Academy</li>
+        <li>Delivered client-facing projects on schedule in a research lab setting</li>
+      </ul>
+    </div>
+
+    <div class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="card-title">HackIoT Lab</div>
+          <div class="card-subtitle">University at Albany</div>
+        </div>
+        <div class="card-date">Aug 2024 – Dec 2024</div>
+      </div>
+      <ul>
+        <li>Researched literature for potential methodological similarities in IoT security</li>
+        <li>Performed penetration testing on IoT devices to identify and document vulnerabilities</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <p class="section-label">Academic Background</p>
+    <h2>Education</h2>
+
+    <div class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="card-title">University at Albany — SUNY</div>
+          <div class="card-subtitle">B.S. in Cybersecurity</div>
+        </div>
+        <div class="card-date">Aug 2023 – Dec 2025</div>
+      </div>
+      <p class="card-coursework">
+        Relevant coursework: <span>Information Security Assurance</span> · <span>Computer &amp; Network Security</span> · <span>Vulnerability Assessment &amp; Testing</span>
+      </p>
+    </div>
+
+    <div class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Herkimer County Community College</div>
+          <div class="card-subtitle">A.S. in Cybersecurity &amp; Digital Forensics</div>
+        </div>
+        <div class="card-date">Aug 2021 – May 2023</div>
+      </div>
+      <p class="card-coursework">
+        Relevant coursework: <span>Network Defense &amp; Countermeasures</span> · <span>Python for Cybersecurity</span> · <span>Computer Forensics &amp; Investigations</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-label">Technical Proficiencies</p>
+    <h2>Skills</h2>
+
+    <div class="skills-grid">
+      <div class="skill-group fade-in">
+        <div class="skill-group-title">Languages</div>
+        <ul class="skill-list">
+          <li>Python</li>
+          <li>Bash / Shell</li>
+          <li>HTML / CSS</li>
+        </ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-title">Security Tools</div>
+        <ul class="skill-list">
+          <li>Nmap</li>
+          <li>Wireshark</li>
+          <li>Metasploit</li>
+          <li>Burp Suite</li>
+        </ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-title">Operating Systems</div>
+        <ul class="skill-list">
+          <li>Linux (Kali, Ubuntu)</li>
+          <li>Windows</li>
+        </ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-title">Concepts</div>
+        <ul class="skill-list">
+          <li>Penetration Testing</li>
+          <li>Digital Forensics</li>
+          <li>Network Security</li>
+          <li>Vulnerability Assessment</li>
+        </ul>
+      </div>
+      <div class="skill-group fade-in">
+        <div class="skill-group-title">Tools &amp; Platforms</div>
+        <ul class="skill-list">
+          <li>Git / GitHub</li>
+          <li>Office 365</li>
+          <li>VS Code</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label">Open Source</p>
+    <h2>Projects</h2>
+
+    <div class="project-card fade-in">
+      <div class="project-title">
+        <a href="https://github.com/jordanpalumbo/binhead" target="_blank" rel="noopener">binhead</a>
+      </div>
+      <p class="project-desc">A lightweight binary header analysis tool built for forensic triage. Reads file magic bytes to identify file types, aiding in rapid incident response and forensic workflows.</p>
+      <span class="tag tag-green">Python</span>
+      <span class="tag tag-green">Forensics</span>
+      <span class="tag">CLI Tool</span>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-title">
+        <a href="https://github.com/jordanpalumbo/networkscanner" target="_blank" rel="noopener">Network Scanner</a>
+      </div>
+      <p class="project-desc">Pings a single user-specified IP address or scans an entire LAN for online devices. Useful for quick network reconnaissance and asset discovery.</p>
+      <span class="tag tag-accent">Python</span>
+      <span class="tag tag-accent">Networking</span>
+      <span class="tag">Recon</span>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-title">
+        <a href="https://github.com/jordanpalumbo/passwordcracker" target="_blank" rel="noopener">MD5 Hash Cracker</a>
+      </div>
+      <p class="project-desc">Dictionary-based MD5 hash cracker using the milw0rm wordlist. Demonstrates offline password attack methodology and hash analysis fundamentals.</p>
+      <span class="tag tag-accent">Python</span>
+      <span class="tag">Cryptography</span>
+      <span class="tag">CTF</span>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section id="certifications">
+    <p class="section-label">Credentials</p>
+    <h2>Certifications</h2>
+
+    <div class="cert-card fade-in">
+      <div class="cert-icon">✦</div>
+      <div>
+        <div class="cert-name">CompTIA Security+</div>
+        <div class="cert-id">Exam SY0-701 · CompTIA</div>
+      </div>
+    </div>
+
+    <!-- INVOLVEMENT -->
+    <br />
+    <p class="section-label" style="margin-top:2.5rem;">Leadership</p>
+    <h2>Community Involvement</h2>
+
+    <div class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Epsilon Delta Psi</div>
+          <div class="card-subtitle">Recruitment &amp; Retention Chair</div>
+        </div>
+      </div>
+      <ul>
+        <li>Developed and implemented recruitment strategies to identify top candidates</li>
+        <li>Tracked and analyzed member attendance rates</li>
+        <li>Maintained direct communication with members regarding scheduling</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-label">Get in touch</p>
+    <h2>Contact</h2>
+    <p class="contact-line">Interested in collaborating or have an opportunity? Reach out directly.</p>
+    <a class="contact-email" href="mailto:palumbojordan9@gmail.com">palumbojordan9@gmail.com</a>
+    <div style="margin-top:2.5rem; display:flex; justify-content:center; gap:1rem;">
+      <a class="btn" href="mailto:palumbojordan9@gmail.com">✉ Send Email</a>
+      <a class="btn btn-ghost" href="https://github.com/jordanpalumbo" target="_blank" rel="noopener">⌥ GitHub Profile</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2025 Jordan Palumbo</span> &nbsp;·&nbsp;
+    <span>Built with HTML &amp; CSS</span>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // stagger siblings
+          const siblings = entry.target.parentElement.querySelectorAll('.fade-in');
+          let delay = 0;
+          siblings.forEach((el, idx) => {
+            if (el === entry.target) delay = idx * 80;
+          });
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Active nav link highlighting
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 80) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
+      });
+    });
+  </script>
 </body>
-
 </html>
-
